@@ -20,10 +20,9 @@
 # under the License.
 ##
 
-from fastapi import FastAPI, UploadFile, Request, Response, status, HTTPException
+from fastapi import FastAPI, Request, Response, status
 from fastapi.logger import logger as fastapi_logger
 from uvicorn import run
-from os.path import splitext
 from datetime import datetime
 from cli.command import __version__
 from secure import (
@@ -38,9 +37,8 @@ from secure import (
 from logging import getLogger
 from pathlib import Path
 from api.custom_logging import CustomizeLogger
-#from requests import exceptions
-from json import load
-#from io import StringIO
+from json import load, JSONDecodeError
+from pysmartdatamodels.pysmartdatamodels import generate_sql_schema
 
 initial_uptime = datetime.now()
 logger = getLogger(__name__)
@@ -52,6 +50,7 @@ def create_app() -> FastAPI:
     logging_config_path = Path.cwd().joinpath("common/config.json")
     customize_logger = CustomizeLogger.make_logger(logging_config_path)
     fastapi_logger.addHandler(customize_logger)
+    app.logger = customize_logger
 
     return app
 
@@ -97,7 +96,7 @@ async def set_secure_headers(request, call_next):
 
 @application.get("/version", status_code=status.HTTP_200_OK)
 def getversion(request: Request):
-    request.app.logger.info("Request version information")
+    request.app.logger.info("GET /version - Request version information")
 
     data = {
         "doc": "...",
@@ -110,33 +109,47 @@ def getversion(request: Request):
     return data
 
 
-@application.post("/parse", status_code=status.HTTP_201_CREATED)
-async def parse(request: Request, file: UploadFile, response: Response):
-    request.app.logger.info(f'Request parse file "{file.filename}"')
+@application.post("/generate", status_code=status.HTTP_200_OK)
+async def parse(request: Request, response: Response):
+    request.app.logger.info(f'POST /generate - Generating a SQL Schema')
 
-    # check if the post request has the file part
-    if splitext(file.filename)[1] != ".ttl":  # type: ignore[type-var]
-        resp = {"message": "Allowed file type is only ttl"}
+    resp = dict()
+
+    try:
+        req_info = await request.json()
+    except JSONDecodeError as inst:
+        request.app.logger.error("Missing JSON payload")
+
+        resp = {
+            "message": "It is needed to provide a JSON object in the payload with the details of the GitHub URL to the"
+                       " Data Model model.yaml from which you want to generate the SQL Schema"
+        }
+
         response.status_code = status.HTTP_400_BAD_REQUEST
-        request.app.logger.error(f'POST /parse 400 Bad Request, file: "{file.filename}"')
+        return resp
+
+    url = req_info["url"]
+    request.app.logger.debug(f'Request generate a SQL Schema from URL "{url}"')
+
+    # check if the post request has a valid GitHub URL to the model.yaml file of a Data Model in the SDM repository
+    if check_github_url(url=url):
+        request.app.logger.debug(f'Valid GitHub URL: "{url}"')
+        sql_schema = generate_sql_schema(model_yaml=url)
+        request.app.logger.info(f'SQL Schema: \n"{sql_schema}"')
+
+        resp = {
+            "message": sql_schema
+        }
+
+        request.app.logger.info(f'POST /generate 200 OK')
+
+        return resp
+
     else:
-        try:
-            content = await file.read()
-        except Exception as e:
-            request.app.logger.error(f'POST /parse 500 Problem reading file: "{file.filename}"')
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-        else:
-            request.app.logger.info("File successfully read")
-
-        # Prepare the content
-        content = content.decode("utf-8")  # type: ignore[assignment]
-
-        # Start parsing the file
-        resp = {"message": "iaea iacta est"}
-        response.status_code = status.HTTP_200_OK
-        request.app.logger.error(f'POST /parse 200 OK, file: "{file.filename}"')
-
-    return resp
+        request.app.logger.error(f'Invalid GitHub URL: "{url}"')
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        resp["message"] = f"Invalid GitHub URL: {url}"
+        return resp
 
 
 def get_uptime():
@@ -161,6 +174,12 @@ def get_url():
     url = f"{config['broker']}/ngsi-ld/v1/entityOperations/create"
 
     return url
+
+
+def check_github_url(url: str) -> bool:
+    github_url_pattern = r"https://github\.com/([^/]+)/([^/]+)/blob/([^/]+)/(.+)"
+
+    return True
 
 
 def launch(app: str = "server:application", host: str = "127.0.0.1", port: int = 5500):
