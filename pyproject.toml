@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sdm-sqlgeneration"
+version = "0.1.0"
+description = "Python Server to generate a SQL Schema based on the model description of a Smart Data Model"
+authors = ["Fernando López Aguilar <fernando.lopez@fiware.org>"]
+readme = "README.md"
+packages = [{include = "sdm"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+loguru = "^0.7.2"
+requests = "^2.31.0"
+fastapi = "^0.109.0"
+uvicorn = "^0.26.0"
+secure = "^0.3.0"
+docopt = "^0.6.2"
+schema = "^0.7.5"
+python-multipart = "^0.0.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
