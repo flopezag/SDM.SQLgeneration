@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Python Server to generate a SQL Schema based on the model description of a Smart Data Model"
 authors = ["Fernando López Aguilar <fernando.lopez@fiware.org>"]
 readme = "README.md"
-packages = [{include = "sdm"}]
+
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -17,6 +17,7 @@ docopt = "^0.6.2"
 schema = "^0.7.5"
 python-multipart = "^0.0.6"
 pysmartdatamodels = "^0.6.3"
+
 
 [build-system]
 requires = ["poetry-core"]

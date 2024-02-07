@@ -40,8 +40,10 @@ from api.custom_logging import CustomizeLogger
 from json import load, JSONDecodeError
 from pysmartdatamodels.pysmartdatamodels import generate_sql_schema
 
+
 initial_uptime = datetime.now()
 logger = getLogger(__name__)
+__version__ = "0.1.0"
 
 
 def create_app() -> FastAPI:
