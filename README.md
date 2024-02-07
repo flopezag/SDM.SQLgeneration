@@ -46,3 +46,39 @@ Execute the following command in the terminal:
     ```shell
     pip install -r requirements.txt
     ```
+
+# Running the code 
+To run the code use the following commands and instructions: 
+
+```
+Usage:
+  generator.py run (--input FILE) [--output]
+  generator.py server [--host HOST] [--port PORT]
+  generator.py (-h | --help)
+  generator.py --version
+
+Arguments:
+  FILE   input file
+  PORT   http port used by the service
+
+Options:
+  -i, --input FILEIN  specify the RDF turtle file to parser
+  -o, --output        generate the corresponding files of the parser RDF turtle file
+  -h, --host HOST     launch the server in the corresponding host
+                      [default: 127.0.0.1]
+  -p, --port PORT     launch the server in the corresponding port
+                      [default: 5500]
+
+  -H, --help          show this help message and exit
+  -v, --version       show version and exit
+```
+
+# OpenAPI documentation 
+
+the full OpenAPI specification is located under [doc/openapi.yaml](doc/openapi.yaml).
+
+This OpenAPI specification defines two paths`/version` and `/generate`. 
+- The `/version` path has a single `GET` operation that returns version information. 
+- The `/generate` path has a single `POST` operation that is used for generating a SQL Schema. 
+
+The `SDMQualityTesting` schema is also defined in the components section.
