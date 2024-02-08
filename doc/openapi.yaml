@@ -10,7 +10,8 @@ paths:
       summary: Get version information
       responses:
         '200':
-          description: OK
+          description: The service is up and running
+          operationId: getVersion
           content:
             application/json:
               schema:
@@ -30,6 +31,8 @@ paths:
   /generate:
     post:
       summary: Generating a SQL Schema
+      description: Generate the corresponding SQL Schema of a provided Data Model in the Smart Data Model repository
+      operationId: generateSQLSchema
       requestBody:
         required: true
         content:
@@ -43,7 +46,7 @@ paths:
                 - url
       responses:
         '200':
-          description: OK
+          description: The SQL Schema has been generated
           content:
             application/json:
               schema:
