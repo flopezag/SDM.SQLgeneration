@@ -8,10 +8,10 @@ paths:
   /version:
     get:
       summary: Get version information
+      description: Get the corresponding version information and the status of the service
+      operationId: getVersion
       responses:
         '200':
-          description: The service is up and running
-          operationId: getVersion
           content:
             application/json:
               schema:

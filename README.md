@@ -36,7 +36,7 @@ Execute the following command in the terminal:
     poetry shell
     ```
 
-    To deactivate the Poetry env run:
+    To deactivate and exit the Poetry Virtual Environment run:
     ```
     exit
     ```
