@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: SDM SQL Schema Generation
   version: 0.1.0
-  description: FastAPI application for SDM Quality Testing
+  description: FastAPI application for SDM SQL Schema generator
 
 paths:
   /version:
