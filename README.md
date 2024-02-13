@@ -12,9 +12,9 @@ It provides an OpenAPI specification with two paths: `/version` and `/generate`.
 
 - The `/generate` path is a POST operation designed to generate a SQL Schema based on the provided data model.
 
-- Request Body: The API expects a JSON object in the payload with the details of the GitHub URL to the Data Model model.yaml from which the SQL Schema will be generated, along with other necessary details
+- Request Body: The API expects a JSON object in the payload with the details of the GitHub URL to the Data Model model.yaml from which the SQL Schema will be generated, along with other necessary details.
 
-This service simplifies the generation of SQL Schemas by providing a clear and structured API. It is particularly useful for automating the process of creating SQL Schemas based on data models, thereby streamlining the development and maintenance of databases
+This service simplifies the generation of SQL Schemas by providing a clear and structured API. It is particularly useful for automating the process of creating SQL Schemas based on data models, thereby streamlining the development and maintenance of databases.
 
 # Create a Python Virtual Environement 
 
