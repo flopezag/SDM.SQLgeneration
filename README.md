@@ -125,8 +125,6 @@ Here is the documentation for the API:
     ```shell
     {
     "url": "https://github.com/your-repo/your-model.yaml",
-    "email": "your-email@example.com",
-    "tests": 10
     }
     ```
     Responses:
