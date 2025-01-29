@@ -1,6 +1,9 @@
 # SDM.SQLgeneration
 
-Python Server to generate a SQL Schema based on the model description of a Smart Data Model.
+The SDM.SQLgeneration service is a Python server that generates a **SQL Schema** based on the model description of 
+a **Smart Data Model**. 
+
+It provides an OpenAPI specification with two paths: `/version` and `/generate`.
 
 **Path: `/version`**
 
@@ -9,15 +12,16 @@ git hash, version, release date, and uptime.
 
 **Path: `/generate`**
 
-- Description: A POST operation used to perform the SQL Schema Generation based on a data model.
-- Request Body: Expects a JSON payload with details of the data model (link to the model.yaml file in GitHub).
+- The `/generate` path is a POST operation designed to generate a SQL Schema based on the provided data model.
 
-    '''json
-    {
-      "url": "<url to the model.yaml file>"  
-    }'''
+- Request Body: The API expects a JSON object in the payload with the details of the GitHub URL to the Data Model 
+model.yaml from which the SQL Schema will be generated, along with other necessary details.
 
-# uv initialization - Running the Project Locally 
+This service simplifies the generation of SQL Schemas by providing a clear and structured API. It is particularly 
+useful for automating the process of creating SQL Schemas based on data models, thereby streamlining the development 
+and maintenance of databases.
+
+# Create a Python Virtual Environement 
 
 Please note that this is a **Python 3.13** project. The installation is based on uv, an extremely fast Python package 
 and project manager, written in Rust. Please follow the [link](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) 
@@ -39,7 +43,8 @@ to install locally.
     ```
 
 2. **Install Dependencies:**
-    If the project's dependencies are not installed, the following command can be used to install them based on the pyproject.toml and poetry.lock files:
+    If the project's dependencies are not installed, the following command can be used to install them based on the
+   [requirements.txt](requirements.txt) file:
 
     ```shell
     uv pip install -r requirements.txt
@@ -69,8 +74,8 @@ Arguments:
   PORT   http port used by the service
 
 Options:
-  -i, --input FILEIN  specify the RDF turtle file to parser
-  -o, --output        generate the corresponding files of the parser RDF turtle file
+  -i, --input FILEIN  description to specify the file to the script
+  -o, --output        generate the corresponding output file
   -h, --host HOST     launch the server in the corresponding host
                       [default: 127.0.0.1]
   -p, --port PORT     launch the server in the corresponding port
@@ -83,6 +88,12 @@ Options:
 To run the service, it is needed to define the corresponding full path to the cert and key files in the 
 [./common/config.json] file.
 
+# OpenAPI documentation 
+
+the full OpenAPI specification is located under [doc/openapi.yaml](doc/openapi.yaml).
+
+This OpenAPI specification defines two paths `/version` and `/generate`. 
+
 ## The `/version` path
 
 - The purpose of the /version path is to provide clients with version information, including details such as the document, git hash, version, release date, and uptime. 
@@ -92,26 +103,43 @@ To run the service, it is needed to define the corresponding full path to the ce
 
 ## The `/generate` path
 
-- The `/generate` path serves as an endpoint for performing the sql generation of a data model. 
-- When a `POST` operation is sent to this path, the API expects a JSON payload containing the url of the model.yaml file of the data model in the GitHub (e.g., `https://raw.githubusercontent.com/smart-data-models/dataModel.Weather/master/WeatherObserved/model.yaml`) 
-- Upon receiving the request, the API processes the information and generate the corresponding SQL Schema for that model.
+- The API is a POST operation at the `/generate` path. 
+- It is designed to generate a SQL Schema based on the provided data model. 
 
-Example of a request should be:
+Here is the documentation for the API:
+- Path: /generate
+- Method: POST
+- Summary: Generating a SQL Schema
+- Request Body: The API expects a JSON object in the payload with the details of the GitHub URL to the Data Model model.yaml from which the SQL Schema will be generated, along with other necessary details.
 
-```shell
-curl -X POST http://localhost:5500/generate \
- -d '{
-       "url": "https://raw.githubusercontent.com/smart-data-models/dataModel.Weather/master/WeatherObserved/model.yaml"
-      }'
-```
+    Example:
+    ```shell
+    {
+      "url": "https://github.com/your-repo/your-model.yaml",
+    }
+    ```
+    
+    Responses:
+    200 OK: If the request is successful, the API returns the generated SQL Schema.
 
-And the response of the server should be:
+    Example Response:
+    ```shell
+    {
+      "message": "Generated SQL Schema Here..."
+    }
+    ```
+  
+    - 400 Bad Request: If the request payload is missing or invalid, the API returns an error message.
 
-```json
-{
-  "message": "CREATE TYPE WeatherObserved_type AS ENUM ('WeatherObserved');\nCREATE TABLE WeatherObserved (address JSON, airQualityIndex NUMERIC, airQualityIndexForecast NUMERIC, airTemperatureForecast NUMERIC, airTemperatureTSA JSON, alternateName TEXT, aqiMajorPollutant TEXT, aqiMajorPollutantForecast TEXT, areaServed TEXT, atmosphericPressure NUMERIC, dataProvider TEXT, dateCreated TIMESTAMP, dateModified TIMESTAMP, dateObserved TIMESTAMP, description TEXT, dewPoint NUMERIC, diffuseIrradiation NUMERIC, directIrradiation NUMERIC, feelsLikeTemperature NUMERIC, gustSpeed NUMERIC, id TEXT PRIMARY KEY, illuminance NUMERIC, location JSON, name TEXT, owner JSON, precipitation NUMERIC, precipitationForecast NUMERIC, pressureTendency JSON, refPointOfInterest TEXT, relativeHumidity NUMERIC, relativeHumidityForecast NUMERIC, seeAlso JSON, snowHeight NUMERIC, solarRadiation NUMERIC, source TEXT, streamGauge NUMERIC, temperature NUMERIC, type WeatherObserved_type, uVIndexMax NUMERIC, weatherType TEXT, windDirection NUMERIC, windSpeed NUMERIC);"
-}
-```
+    Example Response:
+    ```shell
+    {
+      "message": "It is needed to provide a JSON object in the payload with the details of the GitHub URL to the Data Model model.yaml from which you want to generate the SQL Schema"
+    }
+    ```
+
+- Upon receiving a request, the API logs relevant information, such as the request for generating a SQL Schema from a specific URL. It then validates the provided GitHub URL and, if valid, proceeds to generate the SQL Schema. If the URL is invalid, it returns an error message.
 
 # License
-These scripts are licensed under Apache License 2.0.
+
+These server is licensed under [Apache License 2.0](LICENSE).

@@ -41,6 +41,7 @@ from json import load, JSONDecodeError
 from pysmartdatamodels.pysmartdatamodels import generate_sql_schema
 from ssl import SSLContext, PROTOCOL_TLS_SERVER
 
+
 initial_uptime = datetime.now()
 logger = getLogger(__name__)
 

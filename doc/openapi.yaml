@@ -1,0 +1,81 @@
+openapi: 3.0.0
+info:
+  title: SDM SQL Schema Generation
+  version: 0.1.0
+  description: FastAPI application for SDM SQL Schema generator
+
+paths:
+  /version:
+    get:
+      summary: Get version information
+      description: Get the corresponding version information and the status of the service
+      operationId: getVersion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doc:
+                    type: string
+                  git_hash:
+                    type: string
+                  version:
+                    type: string
+                  release_date:
+                    type: string
+                  uptime:
+                    type: string
+
+  /generate:
+    post:
+      summary: Generating a SQL Schema
+      description: Generate the corresponding SQL Schema of a provided Data Model in the Smart Data Model repository
+      operationId: generateSQLSchema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+              required:
+                - url
+      responses:
+        '200':
+          description: The SQL Schema has been generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    SDMQualityTesting:
+      type: object
+      properties:
+        data_model_repo_url:
+          type: string
+        mail:
+          type: string
+        last_test_number:
+          type: integer
+      required:
+        - data_model_repo_url
+        - mail
+        - last_test_number
