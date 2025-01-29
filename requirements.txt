@@ -1,10 +1,10 @@
-# Python3.11 project
-loguru==0.7.2
-requests==2.31.0
-fastapi==0.109.0
-uvicorn==0.26.0
-secure==0.3.0
+# Python3.13 project
+loguru==0.7.3
+requests==2.32.3
+fastapi==0.115.7
+uvicorn==0.34.0
+secure==1.0.1
 docopt==0.6.2
-schema==0.7.5
-python-multipart==0.0.6
-pysmartdatamodels==0.6.3
+schema==0.7.7
+python-multipart==0.0.20
+pysmartdatamodels==0.8.0.1

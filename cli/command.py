@@ -50,7 +50,7 @@ from sys import argv
 from schema import Schema, And, Or, Use, SchemaError  # type: ignore
 
 
-__version__ = "0.1.0"
+__version__ = "0.5.0"
 __author__ = "fla"
 
 

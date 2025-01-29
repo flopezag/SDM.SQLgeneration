@@ -19,9 +19,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 ##
-
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, Response, status, HTTPException
 from fastapi.logger import logger as fastapi_logger
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from uvicorn import run
 from datetime import datetime
 from cli.command import __version__
@@ -39,6 +39,7 @@ from pathlib import Path
 from api.custom_logging import CustomizeLogger
 from json import load, JSONDecodeError
 from pysmartdatamodels.pysmartdatamodels import generate_sql_schema
+from ssl import SSLContext, PROTOCOL_TLS_SERVER
 
 initial_uptime = datetime.now()
 logger = getLogger(__name__)
@@ -46,6 +47,7 @@ logger = getLogger(__name__)
 
 def create_app() -> FastAPI:
     app = FastAPI(title="SDM SQL Schema Generation", debug=False)
+    app.add_middleware(HTTPSRedirectMiddleware)
 
     logging_config_path = Path.cwd().joinpath("common/config.json")
     customize_logger = CustomizeLogger.make_logger(logging_config_path)
@@ -58,7 +60,7 @@ def create_app() -> FastAPI:
 application = create_app()
 
 
-@application.middleware("http")
+@application.middleware("https")
 async def set_secure_headers(request, call_next):
     response = await call_next(request)
     server = Server().set("Secure")
@@ -76,7 +78,7 @@ async def set_secure_headers(request, call_next):
 
     referrer = ReferrerPolicy().no_referrer()
 
-    permissions_value = PermissionsPolicy().geolocation("self", "'spam.com'").vibrate()
+    permissions_value = PermissionsPolicy().geolocation("self", "'spam.com'").camera("'none'").microphone("'none'")
 
     cache_value = CacheControl().must_revalidate()
 
@@ -89,7 +91,8 @@ async def set_secure_headers(request, call_next):
         cache=cache_value,
     )
 
-    secure_headers.framework.fastapi(response)
+    # secure_headers.framework.fastapi(response)
+    await secure_headers.set_headers_async(response)
 
     return response
 
@@ -103,14 +106,14 @@ def getversion(request: Request):
         "git_hash": "nogitversion",
         "version": __version__,
         "release_date": "no released",
-        "uptime": get_uptime(),
+        "uptime": get_uptime()
     }
 
     return data
 
 
 @application.post("/generate", status_code=status.HTTP_200_OK)
-async def parse(request: Request, response: Response):
+async def generate(request: Request, response: Response):
     request.app.logger.info(f'POST /generate - Generating a SQL Schema')
 
     resp = dict()
@@ -141,6 +144,7 @@ async def parse(request: Request, response: Response):
             "message": sql_schema
         }
 
+        response.status_code = status.HTTP_200_OK
         request.app.logger.info(f'POST /generate 200 OK')
 
         return resp
@@ -149,6 +153,7 @@ async def parse(request: Request, response: Response):
         request.app.logger.error(f'Invalid GitHub URL: "{url}"')
         response.status_code = status.HTTP_400_BAD_REQUEST
         resp["message"] = f"Invalid GitHub URL: {url}"
+
         return resp
 
 
@@ -183,6 +188,14 @@ def check_github_url(url: str) -> bool:
 
 
 def launch(app: str = "server:application", host: str = "127.0.0.1", port: int = 5500):
+    ssl_context = SSLContext(PROTOCOL_TLS_SERVER)
+
+    logging_config_path = Path.cwd().joinpath("common/config.json")
+    with open(logging_config_path) as config_file:
+        config = load(config_file)
+
+    ssl_context.load_cert_chain(certfile=config['certfile'], keyfile=config['keyfile'])
+
     run(
         app=app,
         host=host,
@@ -190,6 +203,8 @@ def launch(app: str = "server:application", host: str = "127.0.0.1", port: int =
         log_level="info",
         reload=True,
         server_header=False,
+        ssl_certfile=config['certfile'],
+        ssl_keyfile=config['keyfile']
     )
 
 
