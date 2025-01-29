@@ -21,7 +21,7 @@ This service simplifies the generation of SQL Schemas by providing a clear and s
 useful for automating the process of creating SQL Schemas based on data models, thereby streamlining the development 
 and maintenance of databases.
 
-# Create a Python Virtual Environement 
+# Create a Python Virtual Environment 
 
 Please note that this is a **Python 3.13** project. The installation is based on uv, an extremely fast Python package 
 and project manager, written in Rust. Please follow the [link](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer) 
